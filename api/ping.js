@@ -1,7 +1,11 @@
 // /api/ping  — роутер стучится сюда каждые 2 минуты
 // Сохраняет timestamp, проверяет не было ли пропадания >5 мин
 
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+const kv = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 const OFFLINE_THRESHOLD = 5 * 60; // 5 минут в секундах
 const HISTORY_MAX = 5;

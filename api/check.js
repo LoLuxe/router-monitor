@@ -1,7 +1,11 @@
 // /api/check — вызывается cron-job.org каждые 3 минуты
 // Отправляет алерт если роутер молчит >5 мин (и алерт ещё не был отправлен)
 
-import { kv } from '@vercel/kv';
+import { Redis } from '@upstash/redis';
+const kv = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 const OFFLINE_THRESHOLD = 5 * 60;    // 5 мин
 const ALERT_COOLDOWN    = 30 * 60;   // повтор алерта не чаще раза в 30 мин

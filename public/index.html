@@ -3,298 +3,657 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Router Monitor</title>
+<title>Power Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg:       #0d0d0f;
-    --surface:  #161618;
-    --border:   #232327;
-    --text-1:   #f0f0f0;
-    --text-2:   #8a8a90;
-    --text-3:   #55555c;
-    --green:    #22c55e;
-    --green-bg: rgba(34,197,94,.08);
-    --red:      #ef4444;
-    --red-bg:   rgba(239,68,68,.08);
-  }
-  body {
-    background: var(--bg);
-    color: var(--text-1);
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    min-height: 100dvh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 32px;
-    width: 100%;
-    max-width: 420px;
-  }
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 28px;
-  }
-  .header-left { display: flex; align-items: center; gap: 10px; }
-  .router-icon {
-    width: 36px; height: 36px;
-    background: #1e1e22;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-  .header-title { font-size: 15px; font-weight: 500; }
-  .header-sub   { font-size: 12px; color: var(--text-3); margin-top: 2px; }
-  .badge {
-    display: flex; align-items: center; gap: 7px;
-    padding: 5px 12px;
-    border-radius: 99px;
-    font-size: 13px; font-weight: 500;
-    transition: all .3s;
-  }
-  .badge.online  { background: var(--green-bg); color: var(--green); }
-  .badge.offline { background: var(--red-bg);   color: var(--red);   }
-  .badge.loading { background: #1e1e22; color: var(--text-3); }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-  .dot.pulse { animation: pulse 2s ease-in-out infinite; }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.75)} }
-  .metric-section {
-    background: #111114;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 16px;
-    text-align: center;
-  }
-  .metric-label { font-size: 11px; color: var(--text-3); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; }
-  .metric-value { font-size: 36px; font-weight: 300; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-  .metric-unit  { font-size: 16px; color: var(--text-2); margin-left: 4px; }
-  .section-label { font-size: 11px; color: var(--text-3); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
-  .history-list { display: flex; flex-direction: column; gap: 6px; }
-  .history-item {
-    display: flex; align-items: center; justify-content: space-between;
-    background: #111114;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-  }
-  .history-item-left { display: flex; align-items: center; gap: 10px; }
-  .h-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
-  .h-time { font-size: 13px; font-variant-numeric: tabular-nums; }
-  .h-ago  { font-size: 12px; color: var(--text-3); }
-  .footer { margin-top: 20px; display: flex; align-items: center; justify-content: space-between; }
-  .footer-note { font-size: 11px; color: var(--text-3); }
-  .refresh-btn {
-    font-size: 12px; color: var(--text-3);
-    background: none; border: none; cursor: pointer;
-    padding: 4px 8px; border-radius: 6px;
-    transition: color .15s, background .15s;
-  }
-  .refresh-btn:hover { color: var(--text-2); background: #1e1e22; }
-  .spin { display: inline-block; animation: spin .8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .skeleton {
-    background: linear-gradient(90deg, #1a1a1e 25%, #222226 50%, #1a1a1e 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.4s infinite;
-    border-radius: 6px;
-  }
-  @keyframes shimmer { to { background-position: -200% 0; } }
-  .no-data { text-align: center; padding: 20px 0; color: var(--text-3); font-size: 14px; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* Register section */
-  .register-section {
-    margin-top: 20px;
-    background: #111114;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-  }
-  .register-label { font-size: 11px; color: var(--text-3); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
-  .register-row { display: flex; gap: 8px; }
-  .register-input {
-    flex: 1;
-    background: #1a1a1e;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--text-1);
-    font-size: 13px;
-    padding: 8px 12px;
-    outline: none;
-    transition: border-color .15s;
-  }
-  .register-input:focus { border-color: #555; }
-  .register-input::placeholder { color: var(--text-3); }
-  .register-btn {
-    background: #22c55e18;
-    border: 1px solid #22c55e30;
-    color: var(--green);
-    font-size: 13px;
-    font-weight: 500;
-    padding: 8px 14px;
-    border-radius: 8px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background .15s;
-  }
-  .register-btn:hover { background: #22c55e28; }
-  .register-msg { font-size: 12px; color: var(--text-3); margin-top: 8px; min-height: 16px; }
-  .register-msg.ok  { color: var(--green); }
-  .register-msg.err { color: var(--red); }
+:root {
+  --bg:        #08080a;
+  --s1:        #0e0e10;
+  --s2:        #131315;
+  --s3:        #1a1a1d;
+  --b0:        #ffffff08;
+  --b1:        #ffffff10;
+  --b2:        #ffffff18;
+  --t1:        #ececee;
+  --t2:        #6e6e78;
+  --t3:        #3a3a42;
+  --t4:        #222228;
+  --mono:      'JetBrains Mono', monospace;
+  --sans:      'Inter', -apple-system, sans-serif;
+  --red:       #c0392b;
+  --red-dim:   rgba(192,57,43,.12);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: var(--sans);
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── SHELL ── */
+.shell {
+  width: 100%;
+  max-width: 460px;
+}
+
+/* ── STATUS ROW ── */
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 36px;
+}
+
+.status-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* pill badge */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 28px;
+  padding: 0 10px 0 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  transition: background .4s, border-color .4s, color .4s;
+}
+
+.pill.online {
+  background: rgba(255,255,255,.05);
+  border-color: rgba(255,255,255,.1);
+  color: var(--t1);
+}
+
+.pill.offline {
+  background: var(--red-dim);
+  border-color: rgba(192,57,43,.25);
+  color: #d86055;
+}
+
+.pill.loading {
+  background: var(--s2);
+  border-color: var(--b1);
+  color: var(--t3);
+}
+
+.pulse-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.pulse-dot.anim {
+  animation: blink 2.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .2; }
+}
+
+/* top-right: updated at */
+.updated-at {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t3);
+  letter-spacing: .03em;
+}
+
+/* ── HERO NUMBER ── */
+.hero {
+  margin-bottom: 28px;
+  padding: 36px 32px 32px;
+  background: var(--s1);
+  border: 1px solid var(--b0);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* top-left label */
+.hero-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 20px;
+}
+
+/* number + unit inline */
+.hero-number-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  line-height: 1;
+}
+
+.hero-num {
+  font-size: 80px;
+  font-weight: 300;
+  letter-spacing: -.05em;
+  font-variant-numeric: tabular-nums;
+  color: var(--t1);
+  transition: color .4s;
+}
+
+.hero-num.danger {
+  color: var(--red);
+}
+
+.hero-unit {
+  font-family: var(--mono);
+  font-size: 20px;
+  color: var(--t3);
+  letter-spacing: .04em;
+}
+
+/* subtle grid overlay */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--b0) 1px, transparent 1px),
+    linear-gradient(90deg, var(--b0) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 100%, black 0%, transparent 100%);
+}
+
+/* danger ambient glow */
+.hero.danger::before {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: 50%;
+  transform: translateX(-50%);
+  width: 280px; height: 100px;
+  background: radial-gradient(ellipse, rgba(192,57,43,.18) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── SIGNAL BAR ── */
+.signal-wrap {
+  margin-bottom: 28px;
+}
+
+.bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.bar-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+
+.bar-range {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t4);
+}
+
+.bar-track {
+  height: 24px;
+  background: var(--s1);
+  border: 1px solid var(--b0);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 3px;
+}
+
+.bar-slot {
+  flex: 1;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--s3);
+  transition: background .3s;
+}
+
+.bar-slot.lit {
+  background: var(--t1);
+}
+
+.bar-slot.dim {
+  background: var(--t3);
+}
+
+/* ── STATS ROW ── */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--s1);
+  border: 1px solid var(--b0);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.stat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 300;
+  color: var(--t1);
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t3);
+  margin-top: 2px;
+}
+
+/* ── HISTORY ── */
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.history-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+
+.history-count {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t4);
+}
+
+.history-table {
+  border: 1px solid var(--b0);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--s1);
+}
+
+.h-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--b0);
+  gap: 10px;
+  transition: background .12s;
+}
+
+.h-row:last-child { border-bottom: none; }
+.h-row:hover { background: var(--s2); }
+
+.h-idx {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t4);
+  text-align: right;
+}
+
+.h-ts {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--t1);
+  letter-spacing: .02em;
+}
+
+.h-ago {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t3);
+  white-space: nowrap;
+}
+
+.no-data {
+  padding: 28px 0;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t4);
+  letter-spacing: .06em;
+}
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.countdown {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t4);
+  letter-spacing: .04em;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--b1);
+  color: var(--t3);
+  font-family: var(--sans);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: border-color .15s, color .15s, background .15s;
+  letter-spacing: .02em;
+}
+
+.refresh-btn:hover {
+  border-color: var(--b2);
+  color: var(--t2);
+  background: var(--s2);
+}
+
+.refresh-btn:disabled { opacity: .3; cursor: default; pointer-events: none; }
+
+.refresh-btn svg {
+  width: 12px; height: 12px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin .7s linear infinite; }
+
+/* ── SKELETON ── */
+.skel-table {
+  border: 1px solid var(--b0);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--s1);
+}
+
+.skel-row {
+  height: 42px;
+  border-bottom: 1px solid var(--b0);
+  background: linear-gradient(90deg,
+    var(--s1) 0%,
+    var(--s2) 40%,
+    var(--s3) 60%,
+    var(--s2) 80%,
+    var(--s1) 100%
+  );
+  background-size: 400% 100%;
+  animation: sweep 1.8s ease-in-out infinite;
+}
+
+.skel-row:last-child { border-bottom: none; }
+
+@keyframes sweep {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* delay shimmer per row */
+.skel-row:nth-child(2) { animation-delay: .12s; }
+.skel-row:nth-child(3) { animation-delay: .24s; }
 </style>
 </head>
 <body>
-<main class="card">
-  <div class="header">
-    <div class="header-left">
-      <div class="router-icon">📡</div>
-      <div>
-        <div class="header-title">Router Monitor</div>
-        <div class="header-sub" id="updated">Загрузка...</div>
+<div class="shell" role="main">
+
+  <!-- STATUS ROW -->
+  <div class="status-row">
+    <div class="status-left">
+      <div class="pill loading" id="pill">
+        <span class="pulse-dot" id="dot"></span>
+        <span id="pill-text">—</span>
       </div>
     </div>
-    <div class="badge loading" id="badge">
-      <span class="dot"></span>
-      <span id="badge-text">—</span>
+    <div class="updated-at" id="updated-at">—</div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero" id="hero-card">
+    <div class="hero-label">Тишина с последнего сигнала</div>
+    <div class="hero-number-row">
+      <span class="hero-num" id="h-num">—</span>
+      <span class="hero-unit" id="h-unit"></span>
     </div>
   </div>
 
-  <div class="metric-section">
-    <div class="metric-label">Тишина с последнего сигнала</div>
-    <div><span class="metric-value" id="silence">—</span><span class="metric-unit" id="silence-unit"></span></div>
-  </div>
-
-  <div class="section-label">Последние сигналы</div>
-  <div class="history-list" id="history">
-    <div class="history-item skeleton" style="height:40px;border:none;"></div>
-    <div class="history-item skeleton" style="height:40px;border:none;margin-top:6px"></div>
-    <div class="history-item skeleton" style="height:40px;border:none;margin-top:6px"></div>
-  </div>
-
-  <div class="register-section">
-    <div class="register-label">Уведомления в Telegram</div>
-    <div class="register-row">
-      <input class="register-input" id="tg-id" type="text" placeholder="Ваш Telegram ID (числовой)">
-      <button class="register-btn" onclick="register()">Подписаться</button>
+  <!-- SIGNAL BAR -->
+  <div class="signal-wrap">
+    <div class="bar-header">
+      <span class="bar-label">Активность · 30 мин</span>
+      <span class="bar-range">↤ сейчас</span>
     </div>
-    <div class="register-msg" id="reg-msg">Узнать ID: напишите @userinfobot в Telegram</div>
+    <div class="bar-track" id="bar-track">
+      <!-- slots rendered by JS -->
+    </div>
   </div>
 
+  <!-- STATS ROW -->
+  <div class="stats-row" id="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Всего сигналов</div>
+      <div class="stat-value" id="stat-total">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Последний</div>
+      <div class="stat-value" id="stat-last">—</div>
+      <div class="stat-sub" id="stat-last-date"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="history-header">
+    <span class="history-label">Журнал сигналов</span>
+    <span class="history-count" id="h-count"></span>
+  </div>
+  <div id="history-wrap">
+    <div class="skel-table">
+      <div class="skel-row"></div>
+      <div class="skel-row"></div>
+      <div class="skel-row"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
   <div class="footer">
-    <span class="footer-note" id="next-refresh">Автообновление через 30 с</span>
-    <button class="refresh-btn" id="refresh-btn" onclick="load()">↻ Обновить</button>
+    <span class="countdown" id="countdown">Автообновление через 30 с</span>
+    <button class="refresh-btn" id="refresh-btn" onclick="load()">
+      <svg id="refresh-svg" viewBox="0 0 24 24">
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
+      </svg>
+      Обновить
+    </button>
   </div>
-</main>
+
+</div>
 
 <script>
-function formatSilence(s) {
+const API = '/api/status';
+
+function fmtSilence(s) {
   if (s < 60) return [s, 'с'];
   if (s < 3600) return [Math.round(s / 60), 'мин'];
   return [(s / 3600).toFixed(1), 'ч'];
 }
-function formatDate(ts) {
-  const d = new Date(ts);
-  const today = new Date();
-  const time = d.toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-  if (d.toDateString() === today.toDateString()) return time;
-  return d.toLocaleDateString('ru-RU', { day:'numeric', month:'short' }) + ' ' + time;
+
+function fmtTime(ts) {
+  return new Date(ts).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
-function timeAgo(ts) {
+
+function fmtDateShort(ts) {
+  const d = new Date(ts), t = new Date();
+  if (d.toDateString() === t.toDateString()) return fmtTime(ts);
+  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) + ' ' + fmtTime(ts);
+}
+
+function ago(ts) {
   const s = Math.round((Date.now() - ts) / 1000);
-  if (s < 60) return `${s} с назад`;
-  if (s < 3600) return `${Math.round(s/60)} мин назад`;
-  return `${Math.round(s/3600)} ч назад`;
+  if (s < 60)   return `${s}с`;
+  if (s < 3600) return `${Math.round(s/60)}м`;
+  return `${Math.round(s/3600)}ч`;
+}
+
+function buildBar(history) {
+  const SLOTS = 30, now = Date.now(), bucket = 60000;
+  const active = Array(SLOTS).fill(false);
+  (history || []).forEach(ts => {
+    const i = Math.floor((now - ts) / bucket);
+    if (i >= 0 && i < SLOTS) active[SLOTS - 1 - i] = true;
+  });
+  document.getElementById('bar-track').innerHTML = active.map((on, i) => {
+    const recency = i / (SLOTS - 1);
+    const cls = on ? (recency > 0.6 ? 'lit' : 'dim') : '';
+    return `<div class="bar-slot ${cls}"></div>`;
+  }).join('');
 }
 
 async function load() {
   const btn = document.getElementById('refresh-btn');
-  btn.innerHTML = '<span class="spin">↻</span> Обновить';
+  const svg = document.getElementById('refresh-svg');
   btn.disabled = true;
+  svg.classList.add('spin');
+
   try {
-    const r = await fetch('/api/status?_=' + Date.now());
+    const r = await fetch(API + '?_=' + Date.now());
     render(await r.json());
   } catch {
-    document.getElementById('updated').textContent = 'Ошибка загрузки';
+    document.getElementById('updated-at').textContent = 'Ошибка загрузки';
   } finally {
-    btn.innerHTML = '↻ Обновить';
     btn.disabled = false;
+    svg.classList.remove('spin');
   }
 }
 
 function render(data) {
-  document.getElementById('updated').textContent =
-    'Обновлено в ' + new Date().toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  const pill    = document.getElementById('pill');
+  const dot     = document.getElementById('dot');
+  const pillTxt = document.getElementById('pill-text');
+  const heroNum = document.getElementById('h-num');
+  const heroUnit= document.getElementById('h-unit');
+  const heroCard= document.getElementById('hero-card');
+  const updEl   = document.getElementById('updated-at');
+  const histWrap= document.getElementById('history-wrap');
+  const hCount  = document.getElementById('h-count');
+  const statTotal= document.getElementById('stat-total');
+  const statLast = document.getElementById('stat-last');
+  const statLastD= document.getElementById('stat-last-date');
 
-  const badge = document.getElementById('badge');
-  const dot   = badge.querySelector('.dot');
-  const text  = document.getElementById('badge-text');
-  const sEl   = document.getElementById('silence');
-  const uEl   = document.getElementById('silence-unit');
-  const hEl   = document.getElementById('history');
+  updEl.textContent = fmtTime(Date.now());
 
   if (data.status === 'no_data') {
-    badge.className = 'badge loading';
-    dot.className = 'dot';
-    text.textContent = 'Нет данных';
-    sEl.textContent = '—'; uEl.textContent = '';
-    hEl.innerHTML = '<div class="no-data">Сигналов ещё не было</div>';
+    pill.className = 'pill loading';
+    dot.className  = 'pulse-dot';
+    pillTxt.textContent = 'Нет данных';
+    heroNum.textContent = '—';
+    heroUnit.textContent = '';
+    heroCard.className = 'hero';
+    buildBar([]);
+    histWrap.innerHTML = '<div class="history-table"><div class="no-data">Сигналов не было</div></div>';
     return;
   }
 
   const online = data.status === 'ONLINE';
-  badge.className = 'badge ' + (online ? 'online' : 'offline');
-  dot.className = 'dot' + (online ? ' pulse' : '');
-  text.textContent = online ? 'Есть свет' : 'Нет света';
+  pill.className = 'pill ' + (online ? 'online' : 'offline');
+  dot.className  = 'pulse-dot' + (online ? ' anim' : '');
+  pillTxt.textContent = online ? 'Онлайн' : 'Оффлайн';
 
-  const [val, unit] = formatSilence(data.silence_seconds);
-  sEl.textContent = val;
-  sEl.style.color = data.silence_seconds > 180 ? 'var(--red)' : 'var(--text-1)';
-  uEl.textContent = ' ' + unit;
+  const [val, unit] = fmtSilence(data.silence_seconds);
+  const danger = data.silence_seconds > 180;
+  heroNum.textContent = val;
+  heroUnit.textContent = unit;
+  heroNum.className = 'hero-num' + (danger ? ' danger' : '');
+  heroCard.className = 'hero' + (danger ? ' danger' : '');
 
   const history = data.history || [];
-  hEl.innerHTML = history.length
-    ? history.map(ts => `
-        <div class="history-item">
-          <div class="history-item-left">
-            <span class="h-dot"></span>
-            <span class="h-time">${formatDate(ts)}</span>
-          </div>
-          <span class="h-ago">${timeAgo(ts)}</span>
-        </div>`).join('')
-    : '<div class="no-data">Нет истории</div>';
-}
+  buildBar(history);
 
-async function register() {
-  const id = document.getElementById('tg-id').value.trim();
-  const msg = document.getElementById('reg-msg');
-  if (!/^\d+$/.test(id)) { msg.className='register-msg err'; msg.textContent='Введите числовой Telegram ID'; return; }
-  msg.className='register-msg'; msg.textContent='Отправка...';
-  try {
-    const r = await fetch('/api/register', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ chat_id: id })
-    });
-    const d = await r.json();
-    if (d.ok) { msg.className='register-msg ok'; msg.textContent='✓ Подписка оформлена'; }
-    else       { msg.className='register-msg err'; msg.textContent=d.error||'Ошибка'; }
-  } catch {
-    msg.className='register-msg err'; msg.textContent='Ошибка сети';
+  // stats
+  statTotal.textContent = history.length;
+  if (history.length) {
+    const last = history[0];
+    statLast.textContent  = fmtTime(last);
+    statLastD.textContent = ago(last) + ' назад';
+  } else {
+    statLast.textContent  = '—';
+    statLastD.textContent = '';
   }
+
+  hCount.textContent = history.length ? `${history.length} записей` : '';
+
+  if (!history.length) {
+    histWrap.innerHTML = '<div class="history-table"><div class="no-data">История пуста</div></div>';
+    return;
+  }
+
+  histWrap.innerHTML = `<div class="history-table">
+    ${history.slice(0, 8).map((ts, i) => `
+      <div class="h-row">
+        <span class="h-idx">${String(i + 1).padStart(2, '0')}</span>
+        <span class="h-ts">${fmtDateShort(ts)}</span>
+        <span class="h-ago">${ago(ts)} назад</span>
+      </div>`).join('')}
+  </div>`;
 }
 
-let countdown = 30;
+let n = 30;
 setInterval(() => {
-  countdown--;
-  document.getElementById('next-refresh').textContent = `Автообновление через ${countdown} с`;
-  if (countdown <= 0) { countdown = 30; load(); }
+  n--;
+  document.getElementById('countdown').textContent = `Автообновление через ${n} с`;
+  if (n <= 0) { n = 30; load(); }
 }, 1000);
 
 load();

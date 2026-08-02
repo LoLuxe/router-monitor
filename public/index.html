@@ -6,31 +6,29 @@
 <title>Power Monitor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #08080a;
-  --s1:        #0e0e10;
-  --s2:        #131315;
-  --s3:        #1a1a1d;
-  --b0:        #ffffff08;
-  --b1:        #ffffff10;
-  --b2:        #ffffff18;
-  --t1:        #ececee;
-  --t2:        #6e6e78;
-  --t3:        #3a3a42;
-  --t4:        #222228;
-  --mono:      'JetBrains Mono', monospace;
-  --sans:      'Inter', -apple-system, sans-serif;
-  --red:       #c0392b;
-  --red-dim:   rgba(192,57,43,.12);
+  --bg:     #08080a;
+  --s1:     #0e0e10;
+  --s2:     #131315;
+  --s3:     #1a1a1d;
+  --b0:     #ffffff08;
+  --b1:     #ffffff10;
+  --b2:     #ffffff18;
+  --t1:     #ececee;
+  --t2:     #6e6e78;
+  --t3:     #3a3a42;
+  --t4:     #222228;
+  --mono:   'JetBrains Mono', monospace;
+  --sans:   'Inter', -apple-system, sans-serif;
+  --red:    #c0392b;
+  --red-d:  rgba(192,57,43,.12);
 }
 
-html, body {
-  height: 100%;
-}
+html, body { height: 100%; }
 
 body {
   background: var(--bg);
@@ -42,10 +40,8 @@ body {
   justify-content: center;
   padding: 32px 20px;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── SHELL ── */
 .shell {
   width: 100%;
   max-width: 460px;
@@ -56,16 +52,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 36px;
+  margin-bottom: 32px;
 }
 
-.status-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* pill badge */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -80,149 +69,99 @@ body {
   border: 1px solid transparent;
   transition: background .4s, border-color .4s, color .4s;
 }
+.pill.online  { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1); color: var(--t1); }
+.pill.offline { background: var(--red-d); border-color: rgba(192,57,43,.25); color: #d86055; }
+.pill.loading { background: var(--s2); border-color: var(--b1); color: var(--t3); }
 
-.pill.online {
-  background: rgba(255,255,255,.05);
-  border-color: rgba(255,255,255,.1);
-  color: var(--t1);
-}
-
-.pill.offline {
-  background: var(--red-dim);
-  border-color: rgba(192,57,43,.25);
-  color: #d86055;
-}
-
-.pill.loading {
-  background: var(--s2);
-  border-color: var(--b1);
-  color: var(--t3);
-}
-
-.pulse-dot {
+.pdot {
   width: 5px; height: 5px;
   border-radius: 50%;
   background: currentColor;
   flex-shrink: 0;
 }
+.pdot.anim { animation: blink 2.4s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
 
-.pulse-dot.anim {
-  animation: blink 2.4s ease-in-out infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: .2; }
-}
-
-/* top-right: updated at */
-.updated-at {
+.upd {
   font-family: var(--mono);
   font-size: 10px;
   color: var(--t3);
   letter-spacing: .03em;
 }
 
-/* ── HERO NUMBER ── */
+/* ── HERO ── */
 .hero {
-  margin-bottom: 28px;
-  padding: 36px 32px 32px;
+  margin-bottom: 24px;
+  padding: 32px 28px 28px;
   background: var(--s1);
   border: 1px solid var(--b0);
   border-radius: 16px;
   position: relative;
   overflow: hidden;
 }
-
-/* top-left label */
-.hero-label {
+.hero-lbl {
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--t3);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
-
-/* number + unit inline */
-.hero-number-row {
+.hero-row {
   display: flex;
   align-items: baseline;
   gap: 10px;
   line-height: 1;
 }
-
 .hero-num {
-  font-size: 80px;
+  font-size: 76px;
   font-weight: 300;
   letter-spacing: -.05em;
   font-variant-numeric: tabular-nums;
   color: var(--t1);
   transition: color .4s;
 }
-
-.hero-num.danger {
-  color: var(--red);
-}
-
+.hero-num.danger { color: var(--red); }
 .hero-unit {
   font-family: var(--mono);
   font-size: 20px;
   color: var(--t3);
   letter-spacing: .04em;
 }
-
-/* subtle grid overlay */
 .hero::after {
   content: '';
   position: absolute;
   inset: 0;
-  background-image:
-    linear-gradient(var(--b0) 1px, transparent 1px),
-    linear-gradient(90deg, var(--b0) 1px, transparent 1px);
+  background-image: linear-gradient(var(--b0) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--b0) 1px, transparent 1px);
   background-size: 32px 32px;
   pointer-events: none;
   mask-image: radial-gradient(ellipse 80% 60% at 50% 100%, black 0%, transparent 100%);
 }
-
-/* danger ambient glow */
 .hero.danger::before {
   content: '';
   position: absolute;
   bottom: -60px; left: 50%;
   transform: translateX(-50%);
   width: 280px; height: 100px;
-  background: radial-gradient(ellipse, rgba(192,57,43,.18) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(192,57,43,.16) 0%, transparent 70%);
   pointer-events: none;
-  z-index: 0;
 }
 
 /* ── SIGNAL BAR ── */
-.signal-wrap {
-  margin-bottom: 28px;
-}
-
-.bar-header {
+.bar-wrap { margin-bottom: 24px; }
+.bar-hdr {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   margin-bottom: 8px;
 }
-
-.bar-label {
+.bar-lbl, .bar-rng {
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--t3);
 }
-
-.bar-range {
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--t4);
-}
-
 .bar-track {
   height: 24px;
   background: var(--s1);
@@ -234,39 +173,30 @@ body {
   padding: 0 8px;
   gap: 3px;
 }
-
-.bar-slot {
+.b-slot {
   flex: 1;
   height: 8px;
   border-radius: 2px;
   background: var(--s3);
   transition: background .3s;
 }
+.b-slot.lit { background: var(--t1); }
+.b-slot.dim { background: var(--t3); }
 
-.bar-slot.lit {
-  background: var(--t1);
-}
-
-.bar-slot.dim {
-  background: var(--t3);
-}
-
-/* ── STATS ROW ── */
-.stats-row {
+/* ── STATS ── */
+.stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
-
-.stat-card {
+.stat {
   background: var(--s1);
   border: 1px solid var(--b0);
   border-radius: 12px;
   padding: 16px 18px;
 }
-
-.stat-label {
+.stat-lbl {
   font-family: var(--mono);
   font-size: 9px;
   letter-spacing: .12em;
@@ -274,51 +204,46 @@ body {
   color: var(--t3);
   margin-bottom: 8px;
 }
-
-.stat-value {
+.stat-val {
   font-size: 22px;
   font-weight: 300;
   color: var(--t1);
   letter-spacing: -.03em;
   font-variant-numeric: tabular-nums;
 }
-
 .stat-sub {
   font-family: var(--mono);
   font-size: 10px;
   color: var(--t3);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 /* ── HISTORY ── */
-.history-header {
+.h-hdr {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 10px;
 }
-
-.history-label {
+.h-hdr-lbl {
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: .1em;
   text-transform: uppercase;
   color: var(--t3);
 }
-
-.history-count {
+.h-hdr-cnt {
   font-family: var(--mono);
   font-size: 10px;
   color: var(--t4);
 }
-
-.history-table {
+.h-table {
   border: 1px solid var(--b0);
   border-radius: 12px;
   overflow: hidden;
   background: var(--s1);
+  margin-bottom: 24px;
 }
-
 .h-row {
   display: grid;
   grid-template-columns: 28px 1fr auto;
@@ -328,31 +253,26 @@ body {
   gap: 10px;
   transition: background .12s;
 }
-
 .h-row:last-child { border-bottom: none; }
 .h-row:hover { background: var(--s2); }
-
 .h-idx {
   font-family: var(--mono);
   font-size: 10px;
   color: var(--t4);
   text-align: right;
 }
-
 .h-ts {
   font-family: var(--mono);
   font-size: 12px;
   color: var(--t1);
   letter-spacing: .02em;
 }
-
 .h-ago {
   font-family: var(--mono);
   font-size: 11px;
   color: var(--t3);
   white-space: nowrap;
 }
-
 .no-data {
   padding: 28px 0;
   text-align: center;
@@ -362,21 +282,106 @@ body {
   letter-spacing: .06em;
 }
 
+/* ── TELEGRAM SECTION ── */
+.tg-section {
+  background: var(--s1);
+  border: 1px solid var(--b0);
+  border-radius: 12px;
+  padding: 18px 18px 16px;
+  margin-bottom: 24px;
+}
+.tg-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.tg-icon {
+  width: 28px; height: 28px;
+  border: 1px solid var(--b1);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.tg-icon svg {
+  width: 14px; height: 14px;
+  fill: none;
+  stroke: var(--t2);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tg-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t1);
+  letter-spacing: .01em;
+}
+.tg-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t3);
+  margin-top: 1px;
+}
+.tg-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.tg-input {
+  flex: 1;
+  background: var(--s2);
+  border: 1px solid var(--b1);
+  border-radius: 8px;
+  color: var(--t1);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color .15s;
+  min-width: 0;
+}
+.tg-input:focus { border-color: var(--b2); }
+.tg-input::placeholder { color: var(--t4); }
+.tg-btn {
+  background: var(--s3);
+  border: 1px solid var(--b2);
+  color: var(--t2);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  padding: 9px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, color .15s, border-color .15s;
+  letter-spacing: .02em;
+}
+.tg-btn:hover { background: var(--b2); color: var(--t1); border-color: rgba(255,255,255,.22); }
+.tg-btn:disabled { opacity: .4; cursor: default; }
+.tg-hint {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t3);
+  letter-spacing: .02em;
+  min-height: 14px;
+  transition: color .2s;
+}
+.tg-hint.ok  { color: #5a9e6f; }
+.tg-hint.err { color: #a05050; }
+
 /* ── FOOTER ── */
 .footer {
-  margin-top: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-
 .countdown {
   font-family: var(--mono);
   font-size: 10px;
   color: var(--t4);
   letter-spacing: .04em;
 }
-
 .refresh-btn {
   display: flex;
   align-items: center;
@@ -392,15 +397,8 @@ body {
   transition: border-color .15s, color .15s, background .15s;
   letter-spacing: .02em;
 }
-
-.refresh-btn:hover {
-  border-color: var(--b2);
-  color: var(--t2);
-  background: var(--s2);
-}
-
+.refresh-btn:hover { border-color: var(--b2); color: var(--t2); background: var(--s2); }
 .refresh-btn:disabled { opacity: .3; cursor: default; pointer-events: none; }
-
 .refresh-btn svg {
   width: 12px; height: 12px;
   stroke: currentColor;
@@ -410,7 +408,6 @@ body {
   stroke-linejoin: round;
   flex-shrink: 0;
 }
-
 @keyframes spin { to { transform: rotate(360deg); } }
 .spin { animation: spin .7s linear infinite; }
 
@@ -420,87 +417,70 @@ body {
   border-radius: 12px;
   overflow: hidden;
   background: var(--s1);
+  margin-bottom: 24px;
 }
-
 .skel-row {
   height: 42px;
   border-bottom: 1px solid var(--b0);
-  background: linear-gradient(90deg,
-    var(--s1) 0%,
-    var(--s2) 40%,
-    var(--s3) 60%,
-    var(--s2) 80%,
-    var(--s1) 100%
-  );
+  background: linear-gradient(90deg, var(--s1) 0%, var(--s2) 40%, var(--s3) 60%, var(--s2) 80%, var(--s1) 100%);
   background-size: 400% 100%;
   animation: sweep 1.8s ease-in-out infinite;
 }
-
 .skel-row:last-child { border-bottom: none; }
-
-@keyframes sweep {
-  0%   { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
-}
-
-/* delay shimmer per row */
 .skel-row:nth-child(2) { animation-delay: .12s; }
 .skel-row:nth-child(3) { animation-delay: .24s; }
+@keyframes sweep { 0%{background-position:100% 0} 100%{background-position:-100% 0} }
 </style>
 </head>
 <body>
-<div class="shell" role="main">
+<div class="shell">
 
   <!-- STATUS ROW -->
   <div class="status-row">
-    <div class="status-left">
-      <div class="pill loading" id="pill">
-        <span class="pulse-dot" id="dot"></span>
-        <span id="pill-text">—</span>
-      </div>
+    <div class="pill loading" id="pill">
+      <span class="pdot" id="pdot"></span>
+      <span id="pill-txt">—</span>
     </div>
-    <div class="updated-at" id="updated-at">—</div>
+    <span class="upd" id="upd">—</span>
   </div>
 
   <!-- HERO -->
-  <div class="hero" id="hero-card">
-    <div class="hero-label">Тишина с последнего сигнала</div>
-    <div class="hero-number-row">
+  <div class="hero" id="hero">
+    <div class="hero-lbl">Тишина с последнего сигнала</div>
+    <div class="hero-row">
       <span class="hero-num" id="h-num">—</span>
       <span class="hero-unit" id="h-unit"></span>
     </div>
   </div>
 
   <!-- SIGNAL BAR -->
-  <div class="signal-wrap">
-    <div class="bar-header">
-      <span class="bar-label">Активность · 30 мин</span>
-      <span class="bar-range">↤ сейчас</span>
+  <div class="bar-wrap">
+    <div class="bar-hdr">
+      <span class="bar-lbl">Активность · 30 мин</span>
+      <span class="bar-rng">↤ сейчас</span>
     </div>
-    <div class="bar-track" id="bar-track">
-      <!-- slots rendered by JS -->
-    </div>
+    <div class="bar-track" id="bar"></div>
   </div>
 
-  <!-- STATS ROW -->
-  <div class="stats-row" id="stats-row">
-    <div class="stat-card">
-      <div class="stat-label">Всего сигналов</div>
-      <div class="stat-value" id="stat-total">—</div>
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-lbl">Всего сигналов</div>
+      <div class="stat-val" id="s-total">—</div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Последний</div>
-      <div class="stat-value" id="stat-last">—</div>
-      <div class="stat-sub" id="stat-last-date"></div>
+    <div class="stat">
+      <div class="stat-lbl">Последний</div>
+      <div class="stat-val" id="s-last">—</div>
+      <div class="stat-sub" id="s-last-sub"></div>
     </div>
   </div>
 
   <!-- HISTORY -->
-  <div class="history-header">
-    <span class="history-label">Журнал сигналов</span>
-    <span class="history-count" id="h-count"></span>
+  <div class="h-hdr">
+    <span class="h-hdr-lbl">Журнал сигналов</span>
+    <span class="h-hdr-cnt" id="h-cnt"></span>
   </div>
-  <div id="history-wrap">
+  <div id="h-wrap">
     <div class="skel-table">
       <div class="skel-row"></div>
       <div class="skel-row"></div>
@@ -508,11 +488,31 @@ body {
     </div>
   </div>
 
+  <!-- TELEGRAM -->
+  <div class="tg-section">
+    <div class="tg-header">
+      <div class="tg-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 5L2 12.5l7 1M21 5l-2.5 15L9 13.5M21 5L9 13.5m0 0v5.5l3.5-3"/>
+        </svg>
+      </div>
+      <div>
+        <div class="tg-title">Уведомления в Telegram</div>
+        <div class="tg-sub">Алерты при отключении питания</div>
+      </div>
+    </div>
+    <div class="tg-row">
+      <input class="tg-input" id="tg-id" type="text" placeholder="Ваш числовой Telegram ID">
+      <button class="tg-btn" id="tg-btn" onclick="register()">Подписаться</button>
+    </div>
+    <div class="tg-hint" id="tg-hint">Узнать ID: напишите @userinfobot в Telegram</div>
+  </div>
+
   <!-- FOOTER -->
   <div class="footer">
-    <span class="countdown" id="countdown">Автообновление через 30 с</span>
-    <button class="refresh-btn" id="refresh-btn" onclick="load()">
-      <svg id="refresh-svg" viewBox="0 0 24 24">
+    <span class="countdown" id="cd">Автообновление через 30 с</span>
+    <button class="refresh-btn" id="ref-btn" onclick="load()">
+      <svg id="ref-svg" viewBox="0 0 24 24">
         <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>
       </svg>
       Обновить
@@ -520,141 +520,145 @@ body {
   </div>
 
 </div>
-
 <script>
 const API = '/api/status';
 
-function fmtSilence(s) {
-  if (s < 60) return [s, 'с'];
-  if (s < 3600) return [Math.round(s / 60), 'мин'];
-  return [(s / 3600).toFixed(1), 'ч'];
+function fmtS(s) {
+  if (s < 60)   return [s, 'с'];
+  if (s < 3600) return [Math.round(s/60), 'мин'];
+  return [(s/3600).toFixed(1), 'ч'];
 }
-
 function fmtTime(ts) {
-  return new Date(ts).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  return new Date(ts).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
-
-function fmtDateShort(ts) {
-  const d = new Date(ts), t = new Date();
-  if (d.toDateString() === t.toDateString()) return fmtTime(ts);
-  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' }) + ' ' + fmtTime(ts);
+function fmtDate(ts) {
+  const d=new Date(ts),t=new Date();
+  if(d.toDateString()===t.toDateString()) return fmtTime(ts);
+  return d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})+' '+fmtTime(ts);
 }
-
 function ago(ts) {
-  const s = Math.round((Date.now() - ts) / 1000);
-  if (s < 60)   return `${s}с`;
-  if (s < 3600) return `${Math.round(s/60)}м`;
+  const s=Math.round((Date.now()-ts)/1000);
+  if(s<60)   return `${s}с`;
+  if(s<3600) return `${Math.round(s/60)}м`;
   return `${Math.round(s/3600)}ч`;
 }
 
 function buildBar(history) {
-  const SLOTS = 30, now = Date.now(), bucket = 60000;
-  const active = Array(SLOTS).fill(false);
-  (history || []).forEach(ts => {
-    const i = Math.floor((now - ts) / bucket);
-    if (i >= 0 && i < SLOTS) active[SLOTS - 1 - i] = true;
+  const N=30,now=Date.now(),bkt=60000;
+  const active=Array(N).fill(false);
+  (history||[]).forEach(ts=>{
+    const i=Math.floor((now-ts)/bkt);
+    if(i>=0&&i<N) active[N-1-i]=true;
   });
-  document.getElementById('bar-track').innerHTML = active.map((on, i) => {
-    const recency = i / (SLOTS - 1);
-    const cls = on ? (recency > 0.6 ? 'lit' : 'dim') : '';
-    return `<div class="bar-slot ${cls}"></div>`;
+  document.getElementById('bar').innerHTML=active.map((on,i)=>{
+    const cls=on?(i/N>.6?'lit':'dim'):'';
+    return `<div class="b-slot ${cls}"></div>`;
   }).join('');
 }
 
 async function load() {
-  const btn = document.getElementById('refresh-btn');
-  const svg = document.getElementById('refresh-svg');
-  btn.disabled = true;
-  svg.classList.add('spin');
-
+  const btn=document.getElementById('ref-btn');
+  const svg=document.getElementById('ref-svg');
+  btn.disabled=true; svg.classList.add('spin');
   try {
-    const r = await fetch(API + '?_=' + Date.now());
+    const r=await fetch(API+'?_='+Date.now());
     render(await r.json());
   } catch {
-    document.getElementById('updated-at').textContent = 'Ошибка загрузки';
+    document.getElementById('upd').textContent='Ошибка загрузки';
   } finally {
-    btn.disabled = false;
-    svg.classList.remove('spin');
+    btn.disabled=false; svg.classList.remove('spin');
   }
 }
 
 function render(data) {
-  const pill    = document.getElementById('pill');
-  const dot     = document.getElementById('dot');
-  const pillTxt = document.getElementById('pill-text');
-  const heroNum = document.getElementById('h-num');
-  const heroUnit= document.getElementById('h-unit');
-  const heroCard= document.getElementById('hero-card');
-  const updEl   = document.getElementById('updated-at');
-  const histWrap= document.getElementById('history-wrap');
-  const hCount  = document.getElementById('h-count');
-  const statTotal= document.getElementById('stat-total');
-  const statLast = document.getElementById('stat-last');
-  const statLastD= document.getElementById('stat-last-date');
+  const pill=document.getElementById('pill');
+  const pdot=document.getElementById('pdot');
+  const ptxt=document.getElementById('pill-txt');
+  const hnum=document.getElementById('h-num');
+  const hunit=document.getElementById('h-unit');
+  const hero=document.getElementById('hero');
+  const wrap=document.getElementById('h-wrap');
+  const hcnt=document.getElementById('h-cnt');
+  const stot=document.getElementById('s-total');
+  const slst=document.getElementById('s-last');
+  const slsb=document.getElementById('s-last-sub');
 
-  updEl.textContent = fmtTime(Date.now());
+  document.getElementById('upd').textContent=fmtTime(Date.now());
 
-  if (data.status === 'no_data') {
-    pill.className = 'pill loading';
-    dot.className  = 'pulse-dot';
-    pillTxt.textContent = 'Нет данных';
-    heroNum.textContent = '—';
-    heroUnit.textContent = '';
-    heroCard.className = 'hero';
-    buildBar([]);
-    histWrap.innerHTML = '<div class="history-table"><div class="no-data">Сигналов не было</div></div>';
+  if(data.status==='no_data'){
+    pill.className='pill loading'; pdot.className='pdot';
+    ptxt.textContent='Нет данных';
+    hnum.textContent='—'; hunit.textContent='';
+    hero.className='hero'; buildBar([]);
+    wrap.innerHTML='<div class="h-table"><div class="no-data">Сигналов не было</div></div>';
     return;
   }
 
-  const online = data.status === 'ONLINE';
-  pill.className = 'pill ' + (online ? 'online' : 'offline');
-  dot.className  = 'pulse-dot' + (online ? ' anim' : '');
-  pillTxt.textContent = online ? 'Онлайн' : 'Оффлайн';
+  const online=data.status==='ONLINE';
+  pill.className='pill '+(online?'online':'offline');
+  pdot.className='pdot'+(online?' anim':'');
+  ptxt.textContent=online?'Онлайн':'Оффлайн';
 
-  const [val, unit] = fmtSilence(data.silence_seconds);
-  const danger = data.silence_seconds > 180;
-  heroNum.textContent = val;
-  heroUnit.textContent = unit;
-  heroNum.className = 'hero-num' + (danger ? ' danger' : '');
-  heroCard.className = 'hero' + (danger ? ' danger' : '');
+  const [v,u]=fmtS(data.silence_seconds);
+  const danger=data.silence_seconds>180;
+  hnum.textContent=v; hunit.textContent=u;
+  hnum.className='hero-num'+(danger?' danger':'');
+  hero.className='hero'+(danger?' danger':'');
 
-  const history = data.history || [];
+  const history=data.history||[];
   buildBar(history);
 
-  // stats
-  statTotal.textContent = history.length;
-  if (history.length) {
-    const last = history[0];
-    statLast.textContent  = fmtTime(last);
-    statLastD.textContent = ago(last) + ' назад';
-  } else {
-    statLast.textContent  = '—';
-    statLastD.textContent = '';
-  }
+  stot.textContent=history.length;
+  if(history.length){
+    slst.textContent=fmtTime(history[0]);
+    slsb.textContent=ago(history[0])+' назад';
+  } else { slst.textContent='—'; slsb.textContent=''; }
 
-  hCount.textContent = history.length ? `${history.length} записей` : '';
+  hcnt.textContent=history.length?`${history.length} записей`:'';
 
-  if (!history.length) {
-    histWrap.innerHTML = '<div class="history-table"><div class="no-data">История пуста</div></div>';
-    return;
-  }
-
-  histWrap.innerHTML = `<div class="history-table">
-    ${history.slice(0, 8).map((ts, i) => `
+  wrap.innerHTML=history.length
+    ?`<div class="h-table">${history.slice(0,8).map((ts,i)=>`
       <div class="h-row">
-        <span class="h-idx">${String(i + 1).padStart(2, '0')}</span>
-        <span class="h-ts">${fmtDateShort(ts)}</span>
+        <span class="h-idx">${String(i+1).padStart(2,'0')}</span>
+        <span class="h-ts">${fmtDate(ts)}</span>
         <span class="h-ago">${ago(ts)} назад</span>
-      </div>`).join('')}
-  </div>`;
+      </div>`).join('')}</div>`
+    :'<div class="h-table"><div class="no-data">История пуста</div></div>';
 }
 
-let n = 30;
-setInterval(() => {
+async function register() {
+  const id=document.getElementById('tg-id').value.trim();
+  const hint=document.getElementById('tg-hint');
+  const btn=document.getElementById('tg-btn');
+  if(!/^\d+$/.test(id)){
+    hint.className='tg-hint err';
+    hint.textContent='Введите числовой Telegram ID';
+    return;
+  }
+  hint.className='tg-hint'; hint.textContent='Отправка...';
+  btn.disabled=true;
+  try {
+    const r=await fetch('/api/register',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:id})
+    });
+    const d=await r.json();
+    if(d.ok){ hint.className='tg-hint ok'; hint.textContent='Подписка оформлена'; }
+    else     { hint.className='tg-hint err'; hint.textContent=d.error||'Ошибка сервера'; }
+  } catch {
+    hint.className='tg-hint err'; hint.textContent='Ошибка сети';
+  } finally {
+    btn.disabled=false;
+  }
+}
+
+let n=30;
+setInterval(()=>{
   n--;
-  document.getElementById('countdown').textContent = `Автообновление через ${n} с`;
-  if (n <= 0) { n = 30; load(); }
-}, 1000);
+  document.getElementById('cd').textContent=`Автообновление через ${n} с`;
+  if(n<=0){n=30;load();}
+},1000);
 
 load();
 </script>
